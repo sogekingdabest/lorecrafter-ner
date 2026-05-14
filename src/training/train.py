@@ -1,12 +1,14 @@
-import os
 import json
 import mlflow
 import mlflow.transformers
-import torch
-from transformers import AutoTokenizer, AutoModelForTokenClassification, TrainingArguments, Trainer, DataCollatorForTokenClassification
+from transformers import (
+    AutoTokenizer,
+    AutoModelForTokenClassification,
+    TrainingArguments,
+    Trainer,
+    DataCollatorForTokenClassification,
+)
 from datasets import Dataset
-from seqeval.metrics import classification_report
-from seqeval.scheme import IOB2
 
 from src.training.config import load_config
 from src.training.evaluate import compute_metrics
@@ -84,6 +86,7 @@ def train():
             per_device_eval_batch_size=config["batch_size"],
             num_train_epochs=config["num_epochs"],
             weight_decay=config["weight_decay"],
+            warmup_ratio=config["warmup_ratio"],
             eval_strategy="epoch",
             save_strategy="epoch",
             load_best_model_at_end=True,
@@ -105,17 +108,21 @@ def train():
         trainer.save_model("models/lorecrafter-ner")
         tokenizer.save_pretrained("models/lorecrafter-ner")
 
-        mlflow.log_metrics({
-            "train_loss": train_result.training_loss,
-            "train_epochs": config["num_epochs"],
-        })
+        mlflow.log_metrics(
+            {
+                "train_loss": train_result.training_loss,
+                "train_epochs": config["num_epochs"],
+            }
+        )
 
         mlflow.transformers.log_model(
             transformers_model={"model": model, "tokenizer": tokenizer},
             artifact_path="model",
         )
 
-        print(f"\nModelo guardado en models/lorecrafter-ner | Run ID: {run.info.run_id}")
+        print(
+            f"\nModelo guardado en models/lorecrafter-ner | Run ID: {run.info.run_id}"
+        )
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 import numpy as np
-from seqeval.metrics import accuracy_score, classification_report, f1_score, precision_score, recall_score
+from seqeval.metrics import accuracy_score, classification_report
 from seqeval.scheme import IOB2
 
 
@@ -20,7 +20,9 @@ def compute_metrics(eval_pred, bio_labels):
         true_labels.append(true_seq)
         pred_labels.append(pred_seq)
 
-    report = classification_report(true_labels, pred_labels, mode="strict", scheme=IOB2, output_dict=True)
+    report = classification_report(
+        true_labels, pred_labels, mode="strict", scheme=IOB2, output_dict=True
+    )
 
     result = {}
     base_labels = ["PERSONAJE", "FACCION", "LUGAR", "ARTEFACTO_MAGICO", "RAZA"]

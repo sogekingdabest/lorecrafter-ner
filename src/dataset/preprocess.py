@@ -38,7 +38,13 @@ def convert_to_bio(text, entities, base_labels=BASE_LABELS):
     return tokens, bio_tags
 
 
-def prepare_splits(data_path, output_dir="data/processed", train_ratio=0.8, val_ratio=0.1, test_ratio=0.1):
+def prepare_splits(
+    data_path,
+    output_dir="data/processed",
+    train_ratio=0.8,
+    val_ratio=0.1,
+    test_ratio=0.1,
+):
     with open(data_path) as f:
         data = json.load(f)
 
