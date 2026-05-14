@@ -7,8 +7,13 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    f"postgresql://{os.getenv('DB_USER', 'lore_user')}:{os.getenv('DB_PASSWORD', 'changeme')}@"
-    f"{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'lorecrafter')}"
+    (
+        f"postgresql://{os.getenv('DB_USER', 'lore_user')}:"
+        f"{os.getenv('DB_PASSWORD', 'changeme')}@"
+        f"{os.getenv('DB_HOST', 'localhost')}:"
+        f"{os.getenv('DB_PORT', '5432')}/"
+        f"{os.getenv('DB_NAME', 'lorecrafter')}"
+    ),
 )
 
 engine = create_engine(DATABASE_URL)

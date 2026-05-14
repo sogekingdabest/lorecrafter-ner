@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, JSON
 from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -57,3 +58,19 @@ class ArtefactoMagico(Base):
     portador_id = Column(Integer, ForeignKey("personajes.id"))
 
     portador = relationship("Personaje", back_populates="artefactos")
+
+
+class ExtractionLog(Base):
+    """Registro de cada llamada al endpoint /extract."""
+
+    __tablename__ = "extraction_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    input_text = Column(Text, nullable=False)
+    entity_count = Column(Integer, nullable=False, default=0)
+    entities_found = Column(
+        JSON, nullable=True
+    )  # snapshot [{text, label, start, end}, ...]
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
