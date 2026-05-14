@@ -11,3 +11,7 @@ data/raw/*.txt
 data/processed/*.json
 models/
 *.ipynb_checkpoints/
+
+# Generated artifacts
+data/annotations/weak_labeled.json
+mlflow.db
