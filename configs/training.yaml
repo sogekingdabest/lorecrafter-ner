@@ -1,0 +1,20 @@
+training:
+  model_name: "dslim/bert-base-NER"
+  max_length: 128
+  batch_size: 16
+  learning_rate: 2e-5
+  num_epochs: 4
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  seed: 42
+
+  labels:
+    - "PERSONAJE"
+    - "FACCION"
+    - "LUGAR"
+    - "ARTEFACTO_MAGICO"
+    - "RAZA"
+
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1

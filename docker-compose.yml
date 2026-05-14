@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lorecrafter-db
+    environment:
+      POSTGRES_DB: lorecrafter
+      POSTGRES_USER: lore_user
+      POSTGRES_PASSWORD: changeme
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mlflow:
+    image: python:3.11-slim
+    container_name: lorecrafter-mlflow
+    command: >
+      bash -c "pip install mlflow &&
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow/mlruns.db
+      --default-artifact-root mlflow/artifacts"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow
+
+volumes:
+  postgres_data:
