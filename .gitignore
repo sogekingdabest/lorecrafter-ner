@@ -15,3 +15,7 @@ models/
 # Generated artifacts
 data/annotations/weak_labeled.json
 mlflow.db
+
+# Agent tooling
+.agents/
+skills-lock.json
