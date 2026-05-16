@@ -59,7 +59,7 @@ class LoreCrafterPredictor:
                 # Es un subtoken: extender el end del span actual
                 if current_entity:
                     current_entity["end"] = char_end
-                    current_entity["text"] = text[current_entity["start"]:char_end]
+                    current_entity["text"] = text[current_entity["start"] : char_end]
                 previous_word_idx = word_idx
                 continue
 
@@ -83,7 +83,9 @@ class LoreCrafterPredictor:
             ):
                 # Continuar entidad existente
                 current_entity["end"] = char_end
-                current_entity["text"] = text[current_entity["start"] : char_end]  # noqa: E203
+                current_entity["text"] = text[
+                    current_entity["start"] : char_end
+                ]  # noqa: E203
             else:
                 # Token "O" u I- sin B- previo: cerrar entidad si habia
                 if current_entity:

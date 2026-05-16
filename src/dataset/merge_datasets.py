@@ -140,7 +140,9 @@ def merge_datasets(
             source_label_counts[source] = {}
         for _, _, label in item["entities"]:
             label_counts[label] = label_counts.get(label, 0) + 1
-            source_label_counts[source][label] = source_label_counts[source].get(label, 0) + 1
+            source_label_counts[source][label] = (
+                source_label_counts[source].get(label, 0) + 1
+            )
 
     print(f"\nOverall entity distribution:")
     for label, count in sorted(label_counts.items(), key=lambda x: -x[1]):

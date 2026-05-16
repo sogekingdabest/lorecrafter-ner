@@ -16,9 +16,9 @@ def log_interaction(prompt, response, status="SUCCESS", error=None):
     log_dir = Path("data/logs")
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / "llm_requests.log"
-    
+
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    
+
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(f"[{timestamp}] STATUS: {status}\n")
         f.write(f"--- REQUEST ---\n{prompt}\n")
@@ -26,7 +26,7 @@ def log_interaction(prompt, response, status="SUCCESS", error=None):
             f.write(f"--- RESPONSE ---\n{response}\n")
         if error:
             f.write(f"--- ERROR ---\n{error}\n")
-        f.write("="*80 + "\n\n")
+        f.write("=" * 80 + "\n\n")
 
 
 def get_async_client(llm_config):
@@ -126,13 +126,13 @@ async def generate_single_example(llm_config, ambiguity_prompt=None):
             for ent_dict in parsed["entities"]:
                 if isinstance(ent_dict, list):
                     continue  # Por si el modelo se equivoca y manda una lista vieja
-                
+
                 ent_text = ent_dict.get("entity")
                 label = ent_dict.get("label")
-                
+
                 if not ent_text or not label:
                     continue
-                    
+
                 pattern = re.escape(str(ent_text))
                 for match in re.finditer(pattern, generated_text):
                     start, end = match.span()
@@ -140,12 +140,12 @@ async def generate_single_example(llm_config, ambiguity_prompt=None):
                         exact_entities.append([start, end, label])
 
             exact_entities.sort(key=lambda x: x[0])
-            
+
             filtered_entities = []
             for e in exact_entities:
                 overlap = False
                 for fe in filtered_entities:
-                    if (e[0] < fe[1] and e[1] > fe[0]):
+                    if e[0] < fe[1] and e[1] > fe[0]:
                         overlap = True
                         break
                 if not overlap:
@@ -159,15 +159,24 @@ async def generate_single_example(llm_config, ambiguity_prompt=None):
             if "429" in error_str or "rate limit" in error_str.lower():
                 log_interaction(full_prompt, None, status="RATE_LIMIT", error=error_str)
                 # Sacar el número de segundos si Groq lo provee en el mensaje, o usar el default
-                print(f"  [Rate Limit 429] Esperando {retry_delay}s antes de reintentar... (Intento {attempt+1}/{max_retries})")
+                print(
+                    f"  [Rate Limit 429] Esperando {retry_delay}s antes de reintentar... (Intento {attempt+1}/{max_retries})"
+                )
                 await asyncio.sleep(retry_delay)
-                retry_delay = min(retry_delay * 1.5, 60)  # Backoff exponencial tapado a 60s
+                retry_delay = min(
+                    retry_delay * 1.5, 60
+                )  # Backoff exponencial tapado a 60s
             else:
                 log_interaction(full_prompt, None, status="ERROR", error=error_str)
                 print(f"  Error generating example: {e}")
                 return None
-                
-    log_interaction(full_prompt, None, status="FAILED_MAX_RETRIES", error="Rate limit retries exhausted.")
+
+    log_interaction(
+        full_prompt,
+        None,
+        status="FAILED_MAX_RETRIES",
+        error="Rate limit retries exhausted.",
+    )
     print(f"  Fallo tras {max_retries} reintentos por Rate Limit.")
     return None
 
@@ -185,7 +194,7 @@ async def generate_synthetic_dataset(
     count = gen_config.get("synthetic_count", count)
     batch_size = gen_config.get("batch_size", batch_size)
     output_path = gen_config.get("output_path", output_path)
-    
+
     # max_concurrent defines how many parallel calls to Ollama are allowed
     max_concurrent = gen_config.get("max_concurrent", 5)
 
@@ -193,14 +202,16 @@ async def generate_synthetic_dataset(
     print(f"Batch size: {batch_size}, Max concurrent requests: {max_concurrent}")
 
     all_examples = []
-    
+
     # 1. Resumability: Load existing examples if they exist
     output_file = Path(output_path)
     if output_file.exists():
         try:
             with open(output_file, "r", encoding="utf-8") as f:
                 all_examples = json.load(f)
-            print(f"Resuming... Loaded {len(all_examples)} existing examples from {output_path}")
+            print(
+                f"Resuming... Loaded {len(all_examples)} existing examples from {output_path}"
+            )
         except Exception as e:
             print(f"Warning: Could not read existing file (starting from scratch): {e}")
 
@@ -208,7 +219,7 @@ async def generate_synthetic_dataset(
     if start_idx >= count:
         print(f"Already reached the target count of {count}. Exiting.")
         return all_examples
-        
+
     remaining = count - start_idx
     print(f"Remaining examples to generate: {remaining}")
 
@@ -219,22 +230,24 @@ async def generate_synthetic_dataset(
     # 2. Concurrency: Process in batches with asyncio
     for batch_start in range(start_idx, count, batch_size):
         batch_end = min(batch_start + batch_size, count)
-        
+
         print(f"\nBatch ({batch_start}-{batch_end}) / Total {count}")
 
         tasks = []
         for i in range(batch_start, batch_end):
             if i % 10 == 0:
-                ambiguity_prompt = AMBIGUITY_PROMPTS[ambiguity_idx % len(AMBIGUITY_PROMPTS)]
+                ambiguity_prompt = AMBIGUITY_PROMPTS[
+                    ambiguity_idx % len(AMBIGUITY_PROMPTS)
+                ]
                 ambiguity_idx += 1
             else:
                 ambiguity_prompt = None
-            
+
             tasks.append(worker(llm_config, ambiguity_prompt, semaphore))
-        
+
         # Execute batch concurrently
         results = await asyncio.gather(*tasks)
-        
+
         for res in results:
             if res:
                 all_examples.append(res)
@@ -245,9 +258,11 @@ async def generate_synthetic_dataset(
         output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(all_examples, f, ensure_ascii=False, indent=2)
-            
-        print(f"  Progress saved: {len(all_examples)}/{count} generated ({errors} errors so far)")
-        
+
+        print(
+            f"  Progress saved: {len(all_examples)}/{count} generated ({errors} errors so far)"
+        )
+
         await asyncio.sleep(1)
 
     print(f"\nGeneration complete:")
