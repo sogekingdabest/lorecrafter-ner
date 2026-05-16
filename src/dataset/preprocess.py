@@ -68,5 +68,5 @@ def prepare_splits(
 
 
 if __name__ == "__main__":
-    prepare_splits("data/annotations/weak_labeled.json")
+    prepare_splits("data/annotations/combined.json")
     print(f"\nBIO labels ({len(BIO_LABELS)}): {BIO_LABELS}")

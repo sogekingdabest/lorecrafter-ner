@@ -50,7 +50,7 @@ def tokenize_and_align_labels(examples, tokenizer, max_length=128):
 def train():
     config = load_config()
 
-    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_tracking_uri("sqlite:////tmp/lorecrafter_mlflow.db")
     mlflow.set_experiment("LoreCrafter-NER")
 
     with mlflow.start_run() as run:
