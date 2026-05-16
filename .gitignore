@@ -19,3 +19,8 @@ mlflow.db
 # Agent tooling
 .agents/
 skills-lock.json
+
+# Logs and notebooks
+data/logs/
+notebooks/
+*.ipynb
