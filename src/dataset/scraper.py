@@ -34,11 +34,19 @@ class LoreScraper:
         self.robot_parsers = {}
 
         # User-Agent representing our crawler
-        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 LoreCrafterBot/1.0"
+        self.user_agent = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36 "
+            "LoreCrafterBot/1.0"
+        )
         self.session.headers.update(
             {
                 "User-Agent": self.user_agent,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.8,*/*;q=0.7",
+                "Accept": (
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                    "application/json;q=0.8,*/*;q=0.7"
+                ),
                 "Accept-Language": "en-US,en;q=0.9",
             }
         )

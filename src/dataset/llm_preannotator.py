@@ -1,5 +1,4 @@
 import json
-import os
 import asyncio
 from pathlib import Path
 import yaml
@@ -34,35 +33,39 @@ def log_interaction(prompt, response, status="SUCCESS", error=None):
         f.write("=" * 80 + "\n\n")
 
 
-SYSTEM_PROMPT = """You are an expert NER (Named Entity Recognition) annotator specializing in fantasy literature.
-
-LABELS:
-- PERSONAJE: Character names (individuals, gods, beings with proper names)
-- FACCION: Groups, organizations, guilds, orders, armies, councils, factions
-- LUGAR: Cities, kingdoms, regions, buildings, geographic locations
-- ARTEFACTO_MAGICO: Magical objects, enchanted weapons, artifacts with supernatural properties
-- RAZA: Fantasy races, species, creature types (Elf, Dwarf, Orc, etc.)
-
-TASK:
-Annotate ALL named entities in the provided text.
-
-RULES:
-1. Annotate ONLY proper nouns and specific named entities
-2. Do NOT annotate generic terms like "sword", "city", "king" unless part of a proper name
-3. Include full compound names ("Aragorn son of Arathorn" as one PERSONAJE)
-4. For race names used as proper nouns (e.g., "the Elves"), annotate as RAZA
-5. For faction names that include locations, annotate the full faction name
-
-OUTPUT FORMAT (JSON only, no markdown):
-{
-  "entities": [
-    {"entity": "exact string from text", "label": "LABEL"},
-    ...
-  ]
-}
-
-The "entity" value MUST be an exact substring that appears in the provided text. Do NOT use numerical offsets.
-Return ONLY valid JSON. Do not include explanations."""
+SYSTEM_PROMPT = (
+    "You are an expert NER (Named Entity Recognition) annotator "
+    "specializing in fantasy literature.\n\n"
+    "LABELS:\n"
+    "- PERSONAJE: Character names (individuals, gods, beings with proper names)\n"
+    "- FACCION: Groups, organizations, guilds, orders, armies, councils, factions\n"
+    "- LUGAR: Cities, kingdoms, regions, buildings, geographic locations\n"
+    "- ARTEFACTO_MAGICO: Magical objects, enchanted weapons, "
+    "artifacts with supernatural properties\n"
+    "- RAZA: Fantasy races, species, creature types (Elf, Dwarf, Orc, etc.)\n\n"
+    "TASK:\n"
+    "Annotate ALL named entities in the provided text.\n\n"
+    "RULES:\n"
+    "1. Annotate ONLY proper nouns and specific named entities\n"
+    '2. Do NOT annotate generic terms like "sword", "city", "king" '
+    "unless part of a proper name\n"
+    '3. Include full compound names ("Aragorn son of Arathorn" '
+    "as one PERSONAJE)\n"
+    '4. For race names used as proper nouns (e.g., "the Elves"), '
+    "annotate as RAZA\n"
+    "5. For faction names that include locations, "
+    "annotate the full faction name\n\n"
+    "OUTPUT FORMAT (JSON only, no markdown):\n"
+    "{\n"
+    '  "entities": [\n'
+    '    {"entity": "exact string from text", "label": "LABEL"},\n'
+    "    ...\n"
+    "  ]\n"
+    "}\n\n"
+    'The "entity" value MUST be an exact substring that appears '
+    "in the provided text. Do NOT use numerical offsets.\n"
+    "Return ONLY valid JSON. Do not include explanations."
+)
 
 
 def load_config(config_path="configs/llm_generation.yaml"):
@@ -147,7 +150,9 @@ async def annotate_text(text, llm_config):
             if "429" in error_str or "rate limit" in error_str.lower():
                 log_interaction(full_prompt, None, status="RATE_LIMIT", error=error_str)
                 print(
-                    f"  [Rate Limit 429] Esperando {retry_delay}s antes de reintentar... (Intento {attempt+1}/{max_retries})"
+                    f"  [Rate Limit 429] Esperando {retry_delay}s "
+                    f"antes de reintentar... "
+                    f"(Intento {attempt+1}/{max_retries})"
                 )
                 await asyncio.sleep(retry_delay)
                 retry_delay = min(retry_delay * 1.5, 60)
@@ -264,7 +269,7 @@ async def preannotate_dataset(
 
         await asyncio.sleep(1)
 
-    print(f"\nPre-annotation complete:")
+    print("\nPre-annotation complete:")
     print(f"  Annotated: {len(all_examples)}")
     print(f"  Errors: {errors}")
     print(f"  Output: {output_path}")
@@ -274,7 +279,7 @@ async def preannotate_dataset(
         for _, _, label in ex["entities"]:
             label_counts[label] = label_counts.get(label, 0) + 1
 
-    print(f"\nEntity distribution:")
+    print("\nEntity distribution:")
     for label, count in sorted(label_counts.items(), key=lambda x: -x[1]):
         print(f"  {label}: {count}")
 

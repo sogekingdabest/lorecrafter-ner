@@ -4,7 +4,6 @@ from pathlib import Path
 import yaml
 import time
 import random
-import os
 import re
 from groq import AsyncGroq
 
@@ -36,45 +35,71 @@ def get_async_client(llm_config):
     return async_client
 
 
-SYSTEM_PROMPT = """You are an expert fantasy writer and NER annotator. Your task is to generate realistic fantasy narrative text and annotate all named entities.
-
-LABELS:
-- PERSONAJE: Character names (individuals, gods, beings with names)
-- FACCION: Groups, organizations, guilds, orders, armies, councils
-- LUGAR: Cities, kingdoms, regions, buildings, geographic features
-- ARTEFACTO_MAGICO: Magical objects, enchanted weapons, artifacts with power
-- RAZA: Fantasy races, species, creature types
-
-RULES:
-1. Write 2-5 sentence narratives in a literary fantasy style
-2. Include AMBIGUITIES and complexities:
-   - Pronouns referring to previously mentioned entities
-   - Generic terms vs specific names ("the sword" vs "Anduril")
-   - Compound names ("Aragorn son of Arathorn")
-   - Entities that could be confused (Elf names that sound like city names)
-   - Context-dependent labels ("the north" as direction vs faction)
-   - Partial mentions ("he drew his blade" without naming it)
-3. Use varied sentence structures: complex, compound, with subordinate clauses
-4. Include dialogue occasionally
-5. Mix English and Spanish fantasy prose styles
-6. Do NOT use template-like patterns. Each narrative should feel unique.
-
-OUTPUT FORMAT (JSON only, no markdown):
-{"text": "full narrative text", "entities": [{"entity": "exact string", "label": "LABEL"}, ...]}
-
-The "entity" value MUST be an exact substring that appears in the generated "text". Do NOT use numerical offsets."""
+SYSTEM_PROMPT = (
+    "You are an expert fantasy writer and NER annotator. "
+    "Your task is to generate realistic fantasy narrative text "
+    "and annotate all named entities.\n\n"
+    "LABELS:\n"
+    "- PERSONAJE: Character names (individuals, gods, beings with names)\n"
+    "- FACCION: Groups, organizations, guilds, orders, armies, councils\n"
+    "- LUGAR: Cities, kingdoms, regions, buildings, geographic features\n"
+    "- ARTEFACTO_MAGICO: Magical objects, enchanted weapons, artifacts with power\n"
+    "- RAZA: Fantasy races, species, creature types\n\n"
+    "RULES:\n"
+    "1. Write 2-5 sentence narratives in a literary fantasy style\n"
+    "2. Include AMBIGUITIES and complexities:\n"
+    "   - Pronouns referring to previously mentioned entities\n"
+    '   - Generic terms vs specific names ("the sword" vs "Anduril")\n'
+    '   - Compound names ("Aragorn son of Arathorn")\n'
+    "   - Entities that could be confused "
+    "(Elf names that sound like city names)\n"
+    '   - Context-dependent labels ("the north" as direction vs faction)\n'
+    '   - Partial mentions ("he drew his blade" without naming it)\n'
+    "3. Use varied sentence structures: complex, compound, "
+    "with subordinate clauses\n"
+    "4. Include dialogue occasionally\n"
+    "5. Mix English and Spanish fantasy prose styles\n"
+    "6. Do NOT use template-like patterns. "
+    "Each narrative should feel unique.\n\n"
+    "OUTPUT FORMAT (JSON only, no markdown):\n"
+    '{"text": "full narrative text", "entities": '
+    '[{"entity": "exact string", "label": "LABEL"}, ...]}\n\n'
+    'The "entity" value MUST be an exact substring that appears '
+    'in the generated "text". Do NOT use numerical offsets.'
+)
 
 AMBIGUITY_PROMPTS = [
-    "Include a scene where a character's race is mentioned ambiguously (e.g., 'the elf' could refer to the person or the race).",
-    "Write about a magical artifact that is only described, not named, alongside one that is named.",
-    "Include a faction that shares a name with a location (e.g., 'the Riders of Rohan' vs 'Rohan').",
+    (
+        "Include a scene where a character's race is mentioned ambiguously "
+        "(e.g., 'the elf' could refer to the person or the race)."
+    ),
+    (
+        "Write about a magical artifact that is only described, not named, "
+        "alongside one that is named."
+    ),
+    (
+        "Include a faction that shares a name with a location "
+        "(e.g., 'the Riders of Rohan' vs 'Rohan')."
+    ),
     "Write a passage with compound character names and family lineages.",
-    "Include dialogue where characters refer to each other by titles rather than names.",
+    (
+        "Include dialogue where characters refer to each other "
+        "by titles rather than names."
+    ),
     "Write about a place that is also the name of a people or faction.",
-    "Include a scene with multiple entities of the same type that could be confused.",
-    "Write a passage where the same word could be interpreted as different entity types depending on context.",
-    "Include a description of a magical object without explicitly stating it's magical.",
-    "Write about a journey through multiple locations with faction encounters.",
+    (
+        "Include a scene with multiple entities of the same type "
+        "that could be confused."
+    ),
+    (
+        "Write a passage where the same word could be interpreted as "
+        "different entity types depending on context."
+    ),
+    (
+        "Include a description of a magical object without explicitly "
+        "stating it's magical."
+    ),
+    ("Write about a journey through multiple locations " "with faction encounters."),
 ]
 
 
@@ -160,7 +185,9 @@ async def generate_single_example(llm_config, ambiguity_prompt=None):
                 log_interaction(full_prompt, None, status="RATE_LIMIT", error=error_str)
                 # Sacar el número de segundos si Groq lo provee en el mensaje, o usar el default
                 print(
-                    f"  [Rate Limit 429] Esperando {retry_delay}s antes de reintentar... (Intento {attempt+1}/{max_retries})"
+                    f"  [Rate Limit 429] Esperando {retry_delay}s "
+                    f"antes de reintentar... "
+                    f"(Intento {attempt+1}/{max_retries})"
                 )
                 await asyncio.sleep(retry_delay)
                 retry_delay = min(
@@ -265,7 +292,7 @@ async def generate_synthetic_dataset(
 
         await asyncio.sleep(1)
 
-    print(f"\nGeneration complete:")
+    print("\nGeneration complete:")
     print(f"  Total examples: {len(all_examples)}")
     print(f"  Errors encountered: {errors}")
     print(f"  Output saved to: {output_path}")
@@ -275,7 +302,7 @@ async def generate_synthetic_dataset(
         for _, _, label in ex["entities"]:
             label_counts[label] = label_counts.get(label, 0) + 1
 
-    print(f"\nEntity distribution:")
+    print("\nEntity distribution:")
     for label, count in sorted(label_counts.items(), key=lambda x: -x[1]):
         print(f"  {label}: {count}")
 
