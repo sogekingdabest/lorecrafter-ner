@@ -59,6 +59,7 @@ class LoreCrafterPredictor:
                 # Es un subtoken: extender el end del span actual
                 if current_entity:
                     current_entity["end"] = char_end
+                    current_entity["text"] = text[current_entity["start"]:char_end]
                 previous_word_idx = word_idx
                 continue
 
