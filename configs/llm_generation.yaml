@@ -1,0 +1,54 @@
+llm:
+  model: "meta-llama/llama-4-scout-17b-16e-instruct"  # O puedes usar "llama-3.3-70b-versatile", "gemma2-9b-it"
+  # Groq coge la API key de la variable de entorno GROQ_API_KEY
+  temperature: 0.7
+  top_p: 0.9
+
+generation:
+  synthetic_count: 500
+  batch_size: 25
+  max_concurrent: 2
+  output_path: "data/annotations/llm_synthetic.json"
+
+preannotation:
+  batch_size: 20
+  output_path: "data/annotations/llm_preannotated.json"
+  confidence_threshold: 0.7
+
+merge:
+  output_path: "data/annotations/combined.json"
+  deduplicate: true
+  validate_offsets: true
+
+scraper:
+  sources:
+    - name: "lotr_fandom"
+      base_url: "https://lotr.fandom.com/api.php"
+      pages:
+        - "Main_Page"
+        - "Gandalf"
+        - "Aragorn"
+        - "Legolas"
+        - "Gimli"
+        - "Frodo_Baggins"
+        - "Rivendell"
+        - "Gondor"
+        - "Mordor"
+        - "The_Fellowship_of_the_Ring"
+        - "Elves"
+        - "Dwarves"
+        - "Anduril"
+        - "One_Ring"
+        - "Minas_Tirith"
+        - "Isengard"
+        - "Saruman"
+        - "Galadriel"
+        - "Elrond"
+        - "Rohan"
+        - "Moria"
+    - name: "dnd_srd"
+      base_url: "https://www.dnd5e.tools/"
+      pages:
+        - "srd"
+  output_path: "data/raw/scraped_texts.txt"
+  max_chars_per_page: 3000
