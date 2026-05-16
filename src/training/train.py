@@ -1,4 +1,5 @@
 import json
+import os
 import mlflow
 import mlflow.transformers
 from transformers import (
@@ -50,7 +51,8 @@ def tokenize_and_align_labels(examples, tokenizer, max_length=128):
 def train():
     config = load_config()
 
-    mlflow.set_tracking_uri("sqlite:////tmp/lorecrafter_mlflow.db")
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
+    mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("LoreCrafter-NER")
 
     with mlflow.start_run() as run:

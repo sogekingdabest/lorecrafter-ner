@@ -73,7 +73,7 @@ Automatic entity extraction engine for mythology and fantasy lore. Converts free
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 
-# 2. Start PostgreSQL + MLflow
+# 2. Start infrastructure (PostgreSQL + MLflow + API)
 docker compose up -d
 
 # 3. Generate dataset (choose one or combine)
@@ -93,12 +93,11 @@ PYTHONPATH=. python3 src/dataset/merge_datasets.py
 # 4. Preprocess into train/val/test splits
 PYTHONPATH=. python3 src/dataset/preprocess.py
 
-# 5. Train the model
+# 5. Train the model (logs to MLflow at localhost:5000)
 PYTHONPATH=. python3 src/training/train.py
-
-# 6. Launch the API
-PYTHONPATH=. uvicorn src.api.main:app --reload
 ```
+
+> **Note:** `docker compose up -d` already starts the API at `localhost:8000`. For local development without Docker, run `PYTHONPATH=. uvicorn src.api.main:app --reload` instead.
 
 ### API Usage
 
@@ -146,7 +145,7 @@ Swagger UI available at `http://localhost:8000/docs`.
 
 ### MLflow
 
-Access experiment tracking at `http://localhost:5000` after running `docker compose up -d`.
+Training runs are logged to the MLflow server started by Docker. Access the UI at `http://localhost:5000` after running `docker compose up -d`. The tracking URI is configured via the `MLFLOW_TRACKING_URI` environment variable (see `.env.example`).
 
 ### Model Card
 
@@ -195,7 +194,7 @@ Motor de extracción automática de entidades para mitología y lore de fantasí
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 
-# 2. Iniciar PostgreSQL + MLflow
+# 2. Iniciar infraestructura (PostgreSQL + MLflow + API)
 docker compose up -d
 
 # 3. Generar dataset (elige una opción o combina)
@@ -215,12 +214,11 @@ PYTHONPATH=. python3 src/dataset/merge_datasets.py
 # 4. Preprocesar en splits train/val/test
 PYTHONPATH=. python3 src/dataset/preprocess.py
 
-# 5. Entrenar el modelo
+# 5. Entrenar el modelo (registra en MLflow en localhost:5000)
 PYTHONPATH=. python3 src/training/train.py
-
-# 6. Lanzar la API
-PYTHONPATH=. uvicorn src.api.main:app --reload
 ```
+
+> **Nota:** `docker compose up -d` ya levanta la API en `localhost:8000`. Para desarrollo local sin Docker, ejecuta `PYTHONPATH=. uvicorn src.api.main:app --reload`.
 
 ### Uso de la API
 
@@ -268,7 +266,7 @@ Swagger UI disponible en `http://localhost:8000/docs`.
 
 ### MLflow
 
-Accede al tracking de experimentos en `http://localhost:5000` tras ejecutar `docker compose up -d`.
+Los entrenamientos se registran en el servidor MLflow que levanta Docker. Accede a la UI en `http://localhost:5000` tras ejecutar `docker compose up -d`. El URI de tracking se configura mediante la variable de entorno `MLFLOW_TRACKING_URI` (ver `.env.example`).
 
 ### Model Card
 
@@ -317,7 +315,7 @@ Motor de extracción automática de entidades para mitoloxía e lore de fantasí
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 
-# 2. Iniciar PostgreSQL + MLflow
+# 2. Iniciar infraestructura (PostgreSQL + MLflow + API)
 docker compose up -d
 
 # 3. Xerar dataset (escolle unha opción ou combina)
@@ -337,12 +335,11 @@ PYTHONPATH=. python3 src/dataset/merge_datasets.py
 # 4. Preprocesar en splits train/val/test
 PYTHONPATH=. python3 src/dataset/preprocess.py
 
-# 5. Adestrar o modelo
+# 5. Adestrar o modelo (rexistra en MLflow en localhost:5000)
 PYTHONPATH=. python3 src/training/train.py
-
-# 6. Lanzar a API
-PYTHONPATH=. uvicorn src.api.main:app --reload
 ```
+
+> **Nota:** `docker compose up -d` xa levanta a API en `localhost:8000`. Para desenvolvemento local sen Docker, executa `PYTHONPATH=. uvicorn src.api.main:app --reload`.
 
 ### Uso da API
 
@@ -390,7 +387,7 @@ Swagger UI dispoñible en `http://localhost:8000/docs`.
 
 ### MLflow
 
-Accede ao tracking de experimentos en `http://localhost:5000` tras executar `docker compose up -d`.
+Os adestramentos rexístranse no servidor MLflow que levanta Docker. Accede á UI en `http://localhost:5000` tras executar `docker compose up -d`. O URI de tracking configúrase mediante a variable de entorno `MLFLOW_TRACKING_URI` (ver `.env.example`).
 
 ### Model Card
 
